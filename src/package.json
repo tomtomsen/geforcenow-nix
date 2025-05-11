@@ -1,0 +1,49 @@
+{
+  "name": "geforcenow",
+  "appId": "com.github.kenvandine.${name}",
+  "productName": "GeForce NOW",
+  "version": "1.10.0",
+  "description": "A Linux desktop web app for GeForce NOW",
+  "main": "scripts/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --publish never"
+  },
+  "build": {
+    "asar": false,
+    "linux": {
+      "target": [
+        "snap"
+      ],
+      "category": "Games",
+      "artifactName": "${name}_${version}_linux.${ext}"
+    },
+    "snap": {
+      "plugs": [
+        "default",
+        "audio-record",
+        "joystick"
+      ]
+    },
+    "extraFiles": [
+      "com.github.kenvandine.${name}.desktop"
+    ]
+  },
+  "repository": "https://github.com/kenvandine/geforcenow",
+  "keywords": [
+    "gfn",
+    "geforcenow",
+    "geforce-now"
+  ],
+  "author": "Ken VanDine <ken@vandine.org>",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "electron": "^24.1.2",
+    "electron-builder": "^23.6.0",
+    "electron-installer-snap": "^5.2.0",
+    "electron-packager": "^17.1.1"
+  },
+  "dependencies": {
+    "discord-rich-presence": "^0.0.8"
+  }
+}
