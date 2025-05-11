@@ -9,10 +9,6 @@
       inherit system;
       config.allowUnfree = true;
     };
-    node-modules = pkgs.mkYarnPackage {
-      name = "node-modules";
-      src = ./src;
-    };
   in {
     packages.${system}.geforcenow = pkgs.callPackage ./pkgs/geforcenow.nix {
       lib = pkgs.lib;
@@ -21,7 +17,8 @@
       nodejs = pkgs.nodejs_20;
       yarn = pkgs.yarn;
       src = self + /src;
-      node-modules = node-modules;
+      mkYarnPackage = pkgs.mkYarnPackage;
+      fetchYarnDeps = pkgs.fetchYarnDeps;
     };
 
     defaultPackage.${system} = self.packages.${system}.geforcenow;

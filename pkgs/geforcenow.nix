@@ -5,26 +5,38 @@
 , nodejs
 , yarn
 , src
-, node-modules
+, mkYarnPackage
+, fetchYarnDeps
 }:
 
-stdenv.mkDerivation rec {
+let 
+  hashesFile = builtins.fromJSON (builtins.readFile ./hashes.json);
+in
+mkYarnPackage rec {
   pname = "geforcenow";
   version = "0.1.0";
 
   inherit src;
 
-  nativeBuildInputs = [ makeWrapper nodejs yarn ];
-  buildInputs = [ electron node-modules ];
+  packageJSON = "${src}/package.json";
+  yarnLock = "${src}/yarn.lock";
+
+  offlineCache = fetchYarnDeps {
+    name = "${pname}-yarn-offline-cache";
+    yarnLock = src + "/yarn.lock";
+    hash = hashesFile.yarn_offline_cache_hash;
+  };
+
+  buildPhase = ''
+    echo "Skipping build step"
+  '';
+
+  dontDist = true;
+  distPhase = "true";  # <-- this disables the default distPhase logic
 
   installPhase = ''
     mkdir -p $out/opt/geforcenow
-    cp -r * $out/opt/geforcenow
-
-    ls -la $out/opt/geforcenow
-
-    cd $out/opt/geforcenow
-    yarn install --production
+    cp -r ${src}/* $out/opt/geforcenow
 
     mkdir -p $out/bin
     makeWrapper ${electron}/bin/electron $out/bin/geforcenow \
@@ -36,22 +48,24 @@ stdenv.mkDerivation rec {
 [Desktop Entry]
 Name=GeForce NOW
 Comment=Play PC games via the cloud
-Exec=${placeholder "out"}/bin/geforcenow
+Exec=$out/bin/geforcenow
 Icon=geforcenow
 Terminal=false
 Type=Application
-Categories=Game;Utility;
+Categories=Game;
 EOF
 
-    # Optional icon install (if you have e.g. icon.png in src)
     if [ -f icon.png ]; then
       mkdir -p $out/share/icons/hicolor/128x128/apps
       cp icon.png $out/share/icons/hicolor/128x128/apps/geforcenow.png
     fi
   '';
 
+  nativeBuildInputs = [ makeWrapper nodejs yarn ];
+  buildInputs = [ electron ];
+
   meta = with lib; {
-    description = "GeForce NOW Electron client (unofficial)";
+    description = "Unofficial GeForce NOW Electron client";
     homepage = "https://www.nvidia.com/en-us/geforce-now/";
     license = licenses.unfreeRedistributable;
     platforms = platforms.linux;
