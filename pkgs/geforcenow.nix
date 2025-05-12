@@ -7,32 +7,28 @@
 , src
 , mkYarnPackage
 , fetchYarnDeps
+, makeDesktopItem
 }:
 
-let 
-  hashesFile = builtins.fromJSON (builtins.readFile ./hashes.json);
-in
 mkYarnPackage rec {
   pname = "geforcenow";
   version = "0.1.0";
 
   inherit src;
 
-  packageJSON = "${src}/package.json";
-  yarnLock = "${src}/yarn.lock";
-
   offlineCache = fetchYarnDeps {
-    name = "${pname}-yarn-offline-cache";
-    yarnLock = src + "/yarn.lock";
-    hash = hashesFile.yarn_offline_cache_hash;
+    yarnLock = "${src}/yarn.lock";
+    hash = "sha256-cI+ktIvfTvqSDt49Ukm8nux96ZKQ5va2nSibeNc+Lmo=";
   };
 
-  buildPhase = ''
-    echo "Skipping build step"
-  '';
+  nativeBuildInputs = [ 
+    makeWrapper 
+    nodejs
+    yarn
+  ];
+  buildInputs = [ electron ];
 
-  dontDist = true;
-  distPhase = "true";  # <-- this disables the default distPhase logic
+  doDist = false;
 
   installPhase = ''
     mkdir -p $out/opt/geforcenow
@@ -41,28 +37,22 @@ mkYarnPackage rec {
     mkdir -p $out/bin
     makeWrapper ${electron}/bin/electron $out/bin/geforcenow \
       --add-flags "$out/opt/geforcenow"
-
-    # Desktop entry
-    mkdir -p $out/share/applications
-    cat > $out/share/applications/geforcenow.desktop <<EOF
-[Desktop Entry]
-Name=GeForce NOW
-Comment=Play PC games via the cloud
-Exec=$out/bin/geforcenow
-Icon=geforcenow
-Terminal=false
-Type=Application
-Categories=Game;
-EOF
-
-    if [ -f icon.png ]; then
-      mkdir -p $out/share/icons/hicolor/128x128/apps
-      cp icon.png $out/share/icons/hicolor/128x128/apps/geforcenow.png
-    fi
   '';
 
-  nativeBuildInputs = [ makeWrapper nodejs yarn ];
-  buildInputs = [ electron ];
+  desktopItems = [
+    (makeDesktopItem {
+      name = pname;
+      desktopName = "GeForce NOW";
+      genericName = "GeForce NOW";
+      comment = "Play PC games via the cloud";
+      categories = [
+        "Game"
+      ];
+      exec = "geforcenow";
+      icon = "geforcenow";
+      terminal = false;
+    })
+  ];
 
   meta = with lib; {
     description = "Unofficial GeForce NOW Electron client";

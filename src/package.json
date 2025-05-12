@@ -8,26 +8,6 @@
   "scripts": {
     "start": "electron ."
   },
-  "build": {
-    "asar": false,
-    "linux": {
-      "target": [
-        "snap"
-      ],
-      "category": "Games",
-      "artifactName": "${name}_${version}_linux.${ext}"
-    },
-    "snap": {
-      "plugs": [
-        "default",
-        "audio-record",
-        "joystick"
-      ]
-    },
-    "extraFiles": [
-      "com.github.kenvandine.${name}.desktop"
-    ]
-  },
   "repository": "https://github.com/kenvandine/geforcenow",
   "keywords": [
     "gfn",

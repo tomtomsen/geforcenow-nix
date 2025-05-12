@@ -19,6 +19,7 @@
       src = self + /src;
       mkYarnPackage = pkgs.mkYarnPackage;
       fetchYarnDeps = pkgs.fetchYarnDeps;
+      makeDesktopItem = pkgs.makeDesktopItem;
     };
 
     defaultPackage.${system} = self.packages.${system}.geforcenow;
