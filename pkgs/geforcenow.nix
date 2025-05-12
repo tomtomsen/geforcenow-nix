@@ -35,12 +35,17 @@ mkYarnPackage rec {
   doDist = false;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/opt/geforcenow
     cp -r ${src}/* $out/opt/geforcenow
 
     mkdir -p $out/bin
     makeWrapper ${electron}/bin/electron $out/bin/geforcenow \
       --add-flags "$out/opt/geforcenow"
+
+    runHook installDesktopItems
+    runHook postInstall
   '';
 
   desktopItems = [
