@@ -8,6 +8,7 @@
 , mkYarnPackage
 , fetchYarnDeps
 , makeDesktopItem
+, copyDesktopItems
 }:
 
 mkYarnPackage rec {
@@ -22,11 +23,14 @@ mkYarnPackage rec {
   };
 
   nativeBuildInputs = [ 
+    copyDesktopItems
     makeWrapper 
     nodejs
     yarn
   ];
-  buildInputs = [ electron ];
+  buildInputs = [ 
+    electron
+  ];
 
   doDist = false;
 
